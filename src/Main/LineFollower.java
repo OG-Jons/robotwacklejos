@@ -26,6 +26,8 @@ public class LineFollower {
 
     public static boolean wasOnGreen = false;
 
+    public static int whichTurn = 0;
+
     public static int rightTurn = 0;
 
     enum Direction {
@@ -117,19 +119,28 @@ public class LineFollower {
             // Should check the angles 90 and 270, and if there is a black line, go there
             youShallNotPass();
             driveForward();
-            turnRightAndCheckForBlacks(-90);
-            driveAndCheckForColor();
-            if (colorSensor.getColorID() != 7) {
-                turnAround(-180);
-//                turnLeftAndCheckForBlacks(90);
-//                driveAndCheckForColor();
-//                if (colorSensor.getColorID() != 7) {
-//                    turnLeftAndCheckForBlacks(90);
-//                    driveAndCheckForColor();
-//                }
+            if (colorSensor.getColorID() == 7 && !wasOnGreen) {
+                turnRightAndCheckForBlacks(-90);
+            } else if (colorSensor.getColorID() == 7 && wasOnGreen && rightTurn == 0) {
+                turnLeftAndCheckForBlacks(-90);
+                rightTurn = 1;
+            } else if (colorSensor.getColorID() == 7 && wasOnGreen && rightTurn == 1) {
+                turnLeftAndCheckForBlacks(90);
+            } else {
+                System.out.println("You Stupid");
             }
-            drive();
+
+            //turnRightAndCheckForBlacks(-90);
+
+            driveAndCheckForColor();
+            if (colorSensor.getColorID() != 7 && rightTurn == 0) {
+                turnAround(-90);
+            } else {
+                turnAround(90);
+            }
         }
+        drive();
+    }
 
 
 /*        // Green procedure
@@ -137,7 +148,7 @@ public class LineFollower {
             // Stop and play a sound
             closeComponents();
         }*/
-    }
+}
 
     private static void turnRightAndCheckForBlacks(int turnLength) {
         gyroSensor.reset();
